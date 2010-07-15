@@ -12,7 +12,7 @@
 		{
 			$this->rivet =& $rivet;
 			$this->name = $name;
-			$this->url_pattern = '%'.$url_pattern.'%';
+			$this->url_pattern = '%'.str_replace(':num', '([\d]+)', str_replace(':any', '([^\/]+)', $url_pattern)).'%';
 			$this->handler = $handler;
 			$this->args = array();
 		}
