@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>{% block page_title %}rivet{% endblock %}</title>
+</head>
+<body>
+	
+	<header class="group">
+		<h1>rivet</h1>
+		<nav>
+			<ul>
+				<li><a href="{% url home %}" title="">Home</a></li>
+				<li><a href="{% url example %}" title="">Example</a></li>
+				<li><a href="{% url contact %}" title="">Contact</a></li>
+			</ul>
+		</nav>
+	</header>
+	<section class="group">
+		<header>
+			<h1>{% block content_title %}{% endblock %}</h1>
+		</header>
+		{% block main %}
+			<section>
+				{% block content %}{% endblock %}
+			</section>
+			<aside>{% block aside %}{% endblock %}</aside>
+		{% endblock  %}
+	</section>
+	<footer class="group">
+		footer
+	</footer>
+</body>
+</html>

@@ -1,3 +1,6 @@
-[submodule "rivet/Twig"]
-	path = rivet/Twig
+[submodule "rivet/addons/Twig"]
+	path = rivet/addons/Twig
 	url = git://github.com/fabpot/Twig.git
+[submodule "rivet/addons/Swiftmailer"]
+	path = rivet/addons/Swiftmailer
+	url = http://github.com/swiftmailer/swiftmailer.git

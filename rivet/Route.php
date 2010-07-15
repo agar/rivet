@@ -1,79 +1,83 @@
 <?php
 
 	class Route {
-		
+
 		public $name;
 		private $rivet;
-		private $request;
-		private $pattern;
-		private $view;
+		private $url_pattern;
+		private $handler;
 		private $args;
-		
-		function __construct($rivet, $name, $pattern, $view_callback){
-			$this->rivet = $rivet;
+
+		public function __construct(&$rivet, $name, $url_pattern, $handler)
+		{
+			$this->rivet =& $rivet;
 			$this->name = $name;
-			$this->pattern = "%".$pattern."%";
-			$this->view = $view_callback;
+			$this->url_pattern = '%'.$url_pattern.'%';
+			$this->handler = $handler;
 			$this->args = array();
 		}
-		
-		public function __toString() {
-			return "< Route: '$this->url' - '$this->name' >";
+
+		public function __toString()
+		{
+			return "< Route: '$this->url_pattern' - '$this->name' >";
 		}
-		
-		public function match($request_url)	{
-			if ( preg_match($this->pattern, $request_url, $matches) ) {
-				$this->args = array_slice($matches, 1);
-				array_unshift($this->args, $this->request);
+
+		public function match(&$request)
+		{
+			if (preg_match($this->url_pattern, $request->uri, $matches)) {
+				array_shift($matches);
+				$this->args = $matches;
 				return TRUE;
 			}
 			return FALSE;
 		}
-		
-		public function run() {
-			ob_start();
-			array_unshift($this->args, $this->rivet);
-			return call_user_func_array($this->view, $this->args);
-			ob_end_flush();
-		}
-		
-		public function isNamed() {
-			if( $this->name ){
-				return TRUE;
+
+		public function run()
+		{
+			// "Before PHP version 5.1.0, instanceof would call __autoload() if
+			// the class name did not exist. In addition, if the class was not
+			// loaded, a fatal error would occur.  This can be worked around by
+			// using a dynamic class reference, or a string variable containing
+			// the class name."
+			$closure = 'Closure';
+			if (is_object($this->handler) && ($this->handler instanceof $closure)) {
+				// PHP 5.3+ Closure
+				return call_user_func_array($this->handler, $this->args);
+			} else {
+				// Reference to a method of $this (hopefully)
+				return call_user_func_array(array($this->rivet, $this->handler), $this->args);
+
 			}
 		}
-		
-		public function reverse($args=array()){
-			
-			echo "<pre>";
-			print_r($args);	
-			echo "</pre>";
-			
-			
+
+		public function is_named()
+		{
+			return trim($this->name) != '';
+		}
+
+		public function reverse($args = array())
+		{
 			$url = '/';
-			$pathSegments = explode('/', trim(substr($this->pattern, strpos($this->pattern, '/'), strrpos($this->pattern, '/')-1), '/'));
-			foreach ($pathSegments as $pattern) {
-				if( $pattern != '' ){
-					if( preg_match("%^\((.*)\)$%", $pattern) ){
+			$segments = explode('/', trim(substr($this->url_pattern, strpos($this->url_pattern, '/'), strrpos($this->url_pattern, '/')-1), '/'));
+			foreach($segments as $pattern) {
+				if ($pattern != '') {
+					if (preg_match("%^\([^\)]+\)$%", $pattern)) {
 						$arg = array_shift($args);
-						if( preg_match("%^$pattern$%", $arg) ){
+						if (preg_match("%^$pattern$%", $arg)) {
 							$segment = $arg.'/';
-						}else{
-							throw new Exception("Supplied arg: '$arg' does not match '$pattern' in Route pattern: '$this->pattern'");
+						} else {
+							trigger_error("Supplied arg: '$arg' does not match '$pattern' in Route pattern: '$this->url_pattern'", E_USER_ERROR);
 						}
-					}else{
+					} else {
 						$segment = $pattern.'/';
 					}
 					$url .= $segment;
 				}
 			}
 			if( substr($url, -1) != '/' ){
-				$url.'/';
+				$url .= '/';
 			}
 			return $url;
 		}
-		
-		
-		
+
 	}
-	

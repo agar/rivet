@@ -1,8 +1,8 @@
 <?php
 
 	class Response {
-		
-		private static $status_codes = array(
+
+		private static $codes = array(
 	        '200' => 'OK',
 	        '301' => 'Moved Permanently',
 	        '302' => 'Found',
@@ -15,31 +15,32 @@
 	        '410' => 'Gone',
 	        '500' => 'Internal Server Error',
 	    );
-		
 		private $status = NULL;
 		private $body = '';
-		private $headers = array(
-			'Content-Type'	=>	'text/html', // TODO this should fetch the actual content-type from the config var...
-		);
-		
-		function __construct($body='', $status='200', array $headers=array()) {
+		private $headers = array();
+
+		function __construct($body = '', $status = '200', $headers = array())
+		{
 			$this->status = $status;
-			$this->headers = array_merge($this->headers, $headers);
-			$this->body = $body; // TODO wrap this up in a method to string-ify the return value safely...
+			$this->headers = array_merge(
+				array('Content-Type' => Config::get('default_content_type')),
+				$headers
+			);
+			$this->body = $body;
+		}
+
+		function __toString()
+		{
 			$this->setHeaders();
+			return (string) $this->body;
 		}
-		
-		function __toString(){
-			return (string)$this->body;
-		}
-		
-		private function setHeaders() {
+
+		private function setHeaders()
+		{
 			// Set the status header
-			header("HTTP/1.1 ".$this->status." ".$this::$status_codes[$this->status]);
-			
+			header("HTTP/1.1 ".$this->status." ".self::$codes[$this->status]);
 			foreach ($this->headers as $header => $value) {
 				header("$header: $value");
 			}
-			return TRUE;
 		}
 	}

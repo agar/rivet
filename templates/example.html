@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block page_title %}Templating{% endblock %}
+
+{% block content_title %}Some Examples&hellip;{% endblock %}
+
+{% block content %}
+	
+	<h2>URL Routing</h2>
+
+	<h2>Twig Templating</h2>
+	
+	<p>Read the <a href="http://www.twig-project.org/">Twig documentation</a> for more details.</p>
+	
+	<p>Rivet also has a number of Twig Extensions available.</p>
+	
+	<h3>Reverse URL</h3>
+
+	<h2>Forms</h2>
+	
+	<h3>Building a form</h3>
+
+	<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</p>
+
+<pre><code>
+// Define the form fields
+$form = new Form();
+$form->add_field( new TextField('name', 'Name', '/^.+$/') );
+$form->add_field( new EmailField('email', 'Email') );
+$form->add_field( new RadioField('option', 'Option', array(
+  '1' => 'One',
+  '2' => 'Two',
+  '3' => 'Three',
+)));
+$form->add_field( new SelectField('option', 'Option', array(
+  '1' => 'One',
+  '2' => 'Two',
+  '3' => 'Three',
+)));
+$form->add_field( new SubmitField('submit', 'Submit', array('class' => 'bottom')) );
+
+// output the form in a template
+return new Template('contact.html', array(
+  'var' => 'A variable for substitution',
+  'form' => $form
+));
+</code></pre>
+
+	<h3>Validating</h3>
+	
+<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</p>
+
+<pre><code>
+if ($form->posted() && $form->validate()) {
+  // do something with the data
+} else {
+  // an error will be shown when the form is rendered
+}
+</pre></code>
+
+	<h2>Emails</h2>
+<pre><code>$email = new Email('emails/contact.html', 'emails/contact.txt');
+$email->set_form($form);
+$email->send(
+  'matt.agar@gmail.com',
+  'mattagar@localhost',
+  'Test Message'
+);</code></pre>
+
+	 {{ var }}
+
+	 {{ link }}
+	
+{% endblock %}
