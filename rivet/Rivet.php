@@ -22,15 +22,23 @@
 		private $request;
 		private $routes = array();
 		public $version = '1.0a';
+		private static $instance = null;
 
 		public function __construct()
 		{
 			$this->request = new Request();
+			self::$instance =& $this;
+		}
+
+		final public static function get_instance()
+		{
+			return self::$instance;
 		}
 
 		final public function route($url_pattern, $handler, $name='')
 		{
 			$this->routes[] = new Route($this, $name, $url_pattern, $handler);
+			return $this;
 		}
 
 		final public function dispatch($return = FALSE)

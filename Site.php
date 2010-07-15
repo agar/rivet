@@ -9,7 +9,7 @@
 		{
 			$this->route('^/$', 'home', $name='home');
 			$this->route('^/contact/?$', 'contact', $name='contact');
-			$this->route('^/example/?$', 'example', $name='example');
+			$this->route('^/example/:num/?$', 'example', $name='example');
 
 			parent::__construct();
 		}
@@ -25,11 +25,11 @@
 		/**
 		 * Twig template example
 		 */
-		public function example()
+		public function example($number)
 		{
 			return new Template('example.html', array(
-				'var' => dirname(__FILE__),
-				'link' => $this->url('example')
+				'var' => $number,
+				'link' => $this->url('example', array(12))
 			));
 		}
 

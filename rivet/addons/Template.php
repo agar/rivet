@@ -4,6 +4,11 @@
 	require_once 'Twig/lib/Twig/Autoloader.php';
 	Twig_Autoloader::register();
 
+	// todo: Fix this... eww...
+	//require_once('TwigExtensions/default/Extension/Text.php');
+	//require_once('TwigExtensions/typography/typography.php');
+	require_once('TwigExtensions/rivet-url/rivet-url.php');
+
 	class Template {
 
 		private $template = NULL;
@@ -15,8 +20,6 @@
 		{
 			$this->path = $path;
 			$this->args = $args;
-
-			// html template with php 5.2.4 uses twig
 			$this->load_twig_template();
 		}
 
@@ -33,6 +36,7 @@
 				'debug' => Config::get('template_debug'),
 				'cache' => Config::get('template_cache')
 			));
+			$twig->addExtension(new Rivet_URL_Extension());
 
 			$this->template	= $twig->loadTemplate($this->path);
 			$this->body = $this->template->render($this->args);
