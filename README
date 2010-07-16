@@ -9,53 +9,41 @@ Rivet
 Features
 --------
 
-* regex based URLs using callback-style closures for views
 * [Twig](http://github.com/fabpot/Twig) templates. Django templates in PHP. Pimp.
 
 
 Requirements
 ------------
 
-* PHP 5.3 - yeah, yeah, I know...
+* PHP 5.2.4ish
 
 Example (index.php)
 -------
 
-    <?php
-		require_once('rivet/Rivet.php');
-		
-		// Homepage
-		$rivet->route('^/$', function($r){
-			return new Template('homepage.html');
-		}, $name='home');
+<?php
 
-		// Hello thar! :D
-		$rivet->route('^/hello-world/?$', function($r){
-			echo 'Hello World<br><br>';
-		}, $name='hello');
+	// Include Rivet
+	require_once(dirname(__FILE__).'/rivet/Rivet.php');
 
-		// URL params & Template usage!
-		$rivet->route('^/work/([\w-]+)/([\d]+)/?$', function($r, $foo, $bar){
-			return new Template('param_test.html', array(
-				'foo' => $foo,
-				'bar' => $bar,
-				'test_variable' => array('a', 'b', 'c', 'd')
-			));
-		}, $name='work');
+	// Set some custom config options
+	Config::set('template_cache', dirname(__FILE__).'/cache');
+	Config::set('template_path', dirname(__FILE__).'/templates/');
 
-		// Redirects
-		$rivet->route('^/foo/?$', function($r){
-			return redirect($r->getRoute('redirect-end')->reverse());
-		}, $name='redirect');
+	// Site handler
+	class Site extends Rivet
+	{
+		public function __construct()
+		{
+			$this->route('^/$', 'home', $name='home');
+			parent::__construct();
+		}
 
-		$rivet->route('^/bar/?$', function($r){
-			return new Template('redirect_bar.html');
-		}, $name='redirect-end');
+		public function home()
+		{
+			return new Template('home.html');
+		}
+	}
 
-		// 404 Page!
-		$rivet->route('^/404/?$', function($r){
-			return notfound();
-		}, $name='404');
-		
-		
-		echo $rivet->dispatch();
+	// Create and dispatch the site
+	$site = new Site();
+	$site->dispatch();
